@@ -164,8 +164,13 @@ func main() {
 		tgtDir, _ = reader.ReadString('\n')
 		tgtDir = CleanDir(tgtDir)
 
-		if DirExists(tgtDir) {
-			break
+		if srcDir != tgtDir {
+			if DirExists(tgtDir) {
+				break
+			}
+		} else {
+			fmt.Println("FATAL: Source directory cannot be the same as target directory.")
+			os.Exit(-1)
 		}
 
 		fmt.Println("Please try again.")
