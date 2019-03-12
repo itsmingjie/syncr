@@ -179,9 +179,8 @@ func main() {
 	w.AddFilterHook(watcher.RegexFilterHook(r, false))
 
 	go func() {
-		fmt.Println("\nSyncr service has started. Please leave this window in the background.")
-		fmt.Println()
-
+		fmt.Println("\n==============================")
+		fmt.Println("Syncr service has started. Press [CTRL] + [C] to terminate.")
 		for {
 			select {
 			case event := <-w.Event:
