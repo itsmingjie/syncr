@@ -122,18 +122,55 @@ func FileCP(src, dst string) error {
 	return os.Chmod(dst, srcinfo.Mode())
 }
 
+// DirExists validates the path of the argument string
+func DirExists(path string) bool {
+	// check if the source dir exist
+	src, err := os.Stat(path)
+	if err != nil {
+		fmt.Println(path, "does not exist.")
+		return false
+	}
+
+	// check if the source is indeed a directory or not
+	if !src.IsDir() {
+		fmt.Println(path, "is not a directory.")
+		return false
+	}
+
+	return true
+}
+
 func main() {
 	w := watcher.New()
-
-	// take in 2 directories to start the process
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Source directory: ")
-	srcDir, _ := reader.ReadString('\n')
-	srcDir = CleanDir(srcDir)
 
-	fmt.Print("\nTarget directory: ")
-	tgtDir, _ := reader.ReadString('\n')
-	tgtDir = CleanDir(tgtDir)
+	var srcDir, tgtDir string
+	// take in 2 directories to start the process
+	for {
+		fmt.Print("Source directory: ")
+		srcDir, _ = reader.ReadString('\n')
+		srcDir = CleanDir(srcDir)
+
+		if DirExists(srcDir) {
+			break
+		}
+
+		fmt.Println("Please try again.")
+		fmt.Println()
+	}
+
+	for {
+		fmt.Print("\nTarget directory: ")
+		tgtDir, _ = reader.ReadString('\n')
+		tgtDir = CleanDir(tgtDir)
+
+		if DirExists(tgtDir) {
+			break
+		}
+
+		fmt.Println("Please try again.")
+		fmt.Println()
+	}
 
 	// single event handling
 	w.SetMaxEvents(1)
@@ -142,7 +179,7 @@ func main() {
 	w.AddFilterHook(watcher.RegexFilterHook(r, false))
 
 	go func() {
-		fmt.Println("Syncr service has started. Please leave this window in the background.")
+		fmt.Println("\nSyncr service has started. Please leave this window in the background.")
 		fmt.Println()
 
 		for {
