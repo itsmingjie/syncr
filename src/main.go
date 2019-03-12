@@ -59,6 +59,8 @@ func PrintHeader() {
 func CleanDir(o string) string {
 	o = strings.TrimSuffix(o, "\n")
 	o = strings.TrimSuffix(o, "\r")
+	o = strings.TrimSuffix(o, "\"")
+	o = strings.TrimPrefix(o, "\"")
 	return o
 }
 
@@ -127,13 +129,13 @@ func DirExists(path string) bool {
 	// check if the source dir exist
 	src, err := os.Stat(path)
 	if err != nil {
-		fmt.Println(path, "does not exist.")
+		fmt.Println("❎  \"", path, "\" does not exist.")
 		return false
 	}
 
 	// check if the source is indeed a directory or not
 	if !src.IsDir() {
-		fmt.Println(path, "is not a directory.")
+		fmt.Println("❎  \"", path, "\" is not a directory.")
 		return false
 	}
 
@@ -152,6 +154,7 @@ func main() {
 		srcDir = CleanDir(srcDir)
 
 		if DirExists(srcDir) {
+			fmt.Println("✅  Source Validated:", srcDir)
 			break
 		}
 
@@ -166,10 +169,11 @@ func main() {
 
 		if srcDir != tgtDir {
 			if DirExists(tgtDir) {
+				fmt.Println("✅  Target Validated:", tgtDir)
 				break
 			}
 		} else {
-			fmt.Println("FATAL: Source directory cannot be the same as target directory.")
+			fmt.Println("❎  FATAL: Source directory cannot be the same as target directory.")
 			os.Exit(-1)
 		}
 
@@ -184,12 +188,12 @@ func main() {
 	w.AddFilterHook(watcher.RegexFilterHook(r, false))
 
 	go func() {
-		fmt.Println("\n==============================")
-		fmt.Println("Syncr service has started. Press [CTRL] + [C] to terminate.")
+		fmt.Println()
+		fmt.Println("===\tSyncr service has started. Press [CTRL] + [C] to terminate\t===")
 		for {
 			select {
 			case event := <-w.Event:
-				fmt.Println(event) // Print the event's info.
+				fmt.Println("↻  ", event) // Print the event's info.
 				DirCP(srcDir, tgtDir)
 			case err := <-w.Error:
 				log.Fatalln(err)
